@@ -2,8 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script type="text/javascript" src="http://cdn.bootcss.com/react/15.4.1/react.min.js" charset="utf-8"></script>
-    <script type="text/javascript" src="http://cdn.bootcss.com/react/15.4.1/react-dom.min.js" charset="utf-8"></script>
     <title>drag</title>
     <style>
         * {
@@ -20,7 +18,7 @@
             height: 100%;
         }
 
-        .bar,.bar2 {
+        #bar, #bar2 {
             z-index: 100;
             position: absolute;
             left: 50%;
@@ -44,11 +42,10 @@
 <body>
 <div>
     <div class="main">
-        <div class="bar">我可以被拖动</div>
-        <!--<div class="bar2">我可以被拖动2</div>-->
+        <div id="bar">我可以被拖动</div>
+        <!--<div id="bar2">我可以被拖动2</div>-->
     </div>
 </div>
-<div id="app"></div>
 </body>
 <script>
 
@@ -70,6 +67,7 @@
                 ele['on' + type] = handler;
             }
         },
+
         removeHandler: function (ele, type, handler) {
             if (ele.removeEventListener) {
                 ele.removeEventListener(type, handler, false);
@@ -78,14 +76,31 @@
             } else {
                 ele['on' + type] = null;
             }
+        },
+
+        //添加删除类名，兼容ie
+        hasClass: function (obj, cls) {
+            return obj.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'));
+        },
+
+        addClass: function (obj, cls) {
+            if (!this.hasClass(obj, cls)) obj.className += " " + cls;
+        },
+
+        removeClass: function (obj, cls) {
+            if (this.hasClass(obj, cls)) {
+                var reg = new RegExp('(\\s|^)' + cls + '(\\s|$)');
+                obj.className = obj.className.replace(reg, ' ');
+            }
         }
     }
-    var moveBar = document.getElementsByClassName('bar')[0];
-    //var moveBar2 = document.getElementsByClassName('bar2')[0];
+    //ie8一下不支持getElementsByClassName
+    var moveBar = document.getElementById('bar');
+    //var moveBar2 = document.getElementById('bar2')[0];
 
-    window.onload = function() {
+    window.onload = function () {
         new Drag(moveBar);
-      //  new Drag(moveBar2);
+        //  new Drag(moveBar2);
     }
 
     function Drag(id) {
@@ -106,20 +121,22 @@
 
         //开始拖拽，记录当前位置
         _onDragStart: function () {
-            EventUtil.addHandler(this.bar,'mousedown',function (e) {
+            EventUtil.addHandler(this.bar, 'mousedown', function (e) {
+                console.log(e)
                 this.mousedown = true;
                 var eve = EventUtil.getEvent(e);
                 var target = EventUtil.getTarget(e);
-                target.classList.add('start');
+                EventUtil.addClass(target,'start');
+
                 //元素当前位置
                 //console.log(this)
-                this.disX = eve.clientX - this.offsetLeft;
-                this.disY = eve.clientY - this.offsetTop;
+                this.disX = eve.clientX - target.offsetLeft;
+                this.disY = eve.clientY - target.offsetTop;
             })
         },
 
         //拖拽过程，移动当前位置
-        _onDrag:function () {
+        _onDrag: function () {
             EventUtil.addHandler(this.bar, 'mousemove', function (e) {
                 if (!this.mousedown) {
                     return;
@@ -132,13 +149,13 @@
         },
 
         //完成拖拽
-        _onDragEnd:function () {
+        _onDragEnd: function () {
             EventUtil.addHandler(this.bar, 'mouseup', function (e) {
                 var target = EventUtil.getTarget(e);
                 this.mousedown = false;
-                target.classList.remove('start')
+                EventUtil.removeClass(target,'start');
             });
-        },
+        }
 
     }
 </script>
