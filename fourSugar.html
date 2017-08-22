@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="http://cdn.bootcss.com/react/15.4.1/react.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="http://cdn.bootcss.com/react/15.4.1/react-dom.min.js" charset="utf-8"></script>
+    <title>drag</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        .main {
+            width: 100%;
+            height: 100%;
+        }
+
+        .bar,.bar2 {
+            z-index: 100;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -150px;
+            margin-top: -50px;
+            width: 300px;
+            height: 100px;
+            line-height: 100px;
+            text-align: center;
+            background: gray;
+            cursor: pointer;
+        }
+
+        .start {
+            transform: scale(1.2);
+            border: 3px #33e9ff dotted;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <div class="main">
+        <div class="bar">我可以被拖动</div>
+        <div class="bar2">我可以被拖动2</div>
+    </div>
+</div>
+<div id="app"></div>
+</body>
+<script>
+
+    var EventUtil = {
+        getEvent: function (event) {
+            return event || window.event;
+        },
+
+        getTarget: function (event) {
+            var e = this.getEvent(event)
+            return e.target || e.srcElement;
+        },
+        addHandler: function (ele, type, handler) {
+            if (ele.addEventListener) {
+                ele.addEventListener(type, handler);
+            } else if (ele.attachEvent) {
+                ele.attachEvent('on' + type, handler);
+            } else {
+                ele['on' + type] = handler;
+            }
+        },
+        removeHandler: function (ele, type, handler) {
+            if (ele.removeEventListener) {
+                ele.removeEventListener(type, handler, false);
+            } else if (ele.detachEvent) {
+                ele.detachEvent('on' + type, handler);
+            } else {
+                ele['on' + type] = null;
+            }
+        }
+    }
+    var moveBar = document.getElementsByClassName('bar')[0];
+    var moveBar2 = document.getElementsByClassName('bar2')[0];
+
+    window.onload = function() {
+        new Drag(moveBar);
+        new Drag(moveBar2);
+    }
+
+    function Drag(id) {
+        this.bar = id;
+        this.disX = 0;
+        this.disY = 0;
+        this.mousedown = false;//在bar内move才会拖拽
+        this.init();
+    }
+
+    Drag.prototype = {
+        constructor: Drag,
+        init: function () {
+            this._onDragStart();
+            this._onDrag();
+            this._onDragEnd();
+        },
+
+        //开始拖拽，记录当前位置
+        _onDragStart: function (e) {
+            EventUtil.addHandler(this.bar,'mousedown',function (e) {
+                this.mousedown = true;
+                var eve = EventUtil.getEvent(e);
+                var target = EventUtil.getTarget(e);
+                target.classList.add('start');
+                //元素当前位置
+                //console.log(this)
+                this.disX = eve.clientX - this.offsetLeft;
+                this.disY = eve.clientY - this.offsetTop;
+            })
+        },
+
+        //拖拽过程，移动当前位置
+        _onDrag:function (e) {
+            EventUtil.addHandler(this.bar, 'mousemove', function (e) {
+                if (!this.mousedown) {
+                    return;
+                }
+                var eve = EventUtil.getEvent(e);
+                var target = EventUtil.getTarget(e);
+                target.style.left = (eve.clientX - this.disX + 150) + 'px';
+                target.style.top = (eve.clientY - this.disY + 50) + 'px';
+            });
+        },
+
+        //完成拖拽
+        _onDragEnd:function () {
+            EventUtil.addHandler(this.bar, 'mouseup', function (e) {
+                var target = EventUtil.getTarget(e);
+                this.mousedown = false;
+                target.classList.remove('start')
+            });
+        },
+
+    }
+</script>
+</html>
