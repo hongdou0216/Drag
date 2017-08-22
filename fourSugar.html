@@ -45,7 +45,7 @@
 <div>
     <div class="main">
         <div class="bar">我可以被拖动</div>
-        <div class="bar2">我可以被拖动2</div>
+        <!--<div class="bar2">我可以被拖动2</div>-->
     </div>
 </div>
 <div id="app"></div>
@@ -81,11 +81,11 @@
         }
     }
     var moveBar = document.getElementsByClassName('bar')[0];
-    var moveBar2 = document.getElementsByClassName('bar2')[0];
+    //var moveBar2 = document.getElementsByClassName('bar2')[0];
 
     window.onload = function() {
         new Drag(moveBar);
-        new Drag(moveBar2);
+      //  new Drag(moveBar2);
     }
 
     function Drag(id) {
@@ -105,7 +105,7 @@
         },
 
         //开始拖拽，记录当前位置
-        _onDragStart: function (e) {
+        _onDragStart: function () {
             EventUtil.addHandler(this.bar,'mousedown',function (e) {
                 this.mousedown = true;
                 var eve = EventUtil.getEvent(e);
@@ -119,7 +119,7 @@
         },
 
         //拖拽过程，移动当前位置
-        _onDrag:function (e) {
+        _onDrag:function () {
             EventUtil.addHandler(this.bar, 'mousemove', function (e) {
                 if (!this.mousedown) {
                     return;
