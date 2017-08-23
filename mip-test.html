@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html mip>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+    <title>Mip hd carousel</title>
+    <link rel="stylesheet" type="text/css" href="https://mipcache.bdstatic.com/static/v1/mip.css">
+    <link rel="canonical" href="https://github.com/hongdou0216/Drag/blob/master/mipDemo.html">
+    <style mip-custom>
+        .mess{
+            position: absolute;
+            z-index: 100;
+            font-size: 20px;
+            color: #fff;
+            left: 10px;
+            bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<mip-carousel
+        autoplay
+        defer="3000"
+        layout="fixed-height"
+        height="200"
+        indicator
+        buttonController>
+    <div>
+        <span class="mess">图片1</span>
+        <mip-img src="https://www.mipengine.org/static/img/sample_01.jpg">
+        </mip-img>
+    </div>
+    <div>
+        <span class="mess">图片2</span>
+        <mip-img src="https://www.mipengine.org/static/img/sample_02.jpg">
+        </mip-img>
+    </div>
+    <div>
+        <span class="mess">图片3</span>
+        <mip-img src="https://www.mipengine.org/static/img/sample_03.jpg">
+        </mip-img>
+    </div>
+
+
+</mip-carousel>
+
+<script src="https://mipcache.bdstatic.com/static/v1/mip.js"></script>
+
+</body>
+</html>
