@@ -13,12 +13,12 @@
             height: 100%;
         }
 
-        .main {
+        #main {
             width: 100%;
             height: 100%;
         }
 
-        #bar, #bar2 {
+        #bar {
             z-index: 100;
             position: absolute;
             left: 50%;
@@ -34,17 +34,14 @@
         }
 
         .start {
-            transform: scale(1.2);
+            transform: scale(1.1);
             border: 3px #33e9ff dotted;
         }
     </style>
 </head>
 <body>
-<div>
-    <div class="main">
-        <div id="bar">我可以被拖动</div>
-        <!--<div id="bar2">我可以被拖动2</div>-->
-    </div>
+<div id="main">
+    <div id="bar">我可以被拖动</div>
 </div>
 </body>
 <script>
@@ -82,22 +79,47 @@
                 var reg = new RegExp('(\\s|^)' + cls + '(\\s|$)');
                 obj.className = obj.className.replace(reg, ' ');
             }
+        },
+        //边界值
+        getBoundValue: function (direction, range) {
+            if (direction === 'row') {
+                if (150 > range) {
+                    return '150px';
+                } else {
+                    if (range > (document.documentElement.clientWidth - 150)) {
+                        return document.documentElement.clientWidth - 150 + 'px';
+                    } else {
+                        return range + 'px';
+                    }
+                }
+            } else if (direction === 'col') {
+                if (50 > range) {
+                    return '50px';
+                } else {
+                    if (range > (document.documentElement.clientHeight - 50)) {
+                        return document.documentElement.clientHeight - 50 + 'px';
+                    } else {
+                        return range + 'px';
+                    }
+                }
+            }
         }
+
     }
+    var $mod = document.getElementById('main');
     //ie8一下不支持getElementsByClassName
-    var moveBar = document.getElementById('bar');
-    //var moveBar2 = document.getElementById('bar2')[0];
+    var $moveBar = document.getElementById('bar');
 
     window.onload = function () {
-        new Drag(moveBar);
-        //  new Drag(moveBar2);
+        new Drag($mod, $moveBar);
     }
 
-    function Drag(id) {
-        this.bar = id;
+    function Drag($mod, $bar) {
+        this.$bar = $bar;
+        this.$mod = $mod;
         this.disX = 0;
         this.disY = 0;
-        this.mousedown = false;//在bar内move才会拖拽
+        this.mousedown = false;//点击bar后，鼠标move才会拖拽
         this.init();
     }
 
@@ -111,39 +133,44 @@
 
         //开始拖拽，记录当前位置
         _onDragStart: function () {
-            EventUtil.addHandler(this.bar, 'mousedown', function (e) {
-                console.log(e)
-                this.mousedown = true;
+            var that = this;
+            EventUtil.addHandler(that.$bar, 'mousedown', function (e) {
+                // console.log(that.$mod)
+                that.mousedown = true;
                 var eve = EventUtil.getEvent(e);
-                var target = EventUtil.getTarget(e);
-                EventUtil.addClass(target,'start');
+                var target = EventUtil.getTarget(eve);
+                EventUtil.addClass(target, 'start');
 
                 //元素当前位置
-                //console.log(this)
-                this.disX = eve.clientX - target.offsetLeft;
-                this.disY = eve.clientY - target.offsetTop;
+                //console.log(that)
+                that.disX = eve.clientX - target.offsetLeft;
+                that.disY = eve.clientY - target.offsetTop;
             })
         },
 
         //拖拽过程，移动当前位置
         _onDrag: function () {
-            EventUtil.addHandler(this.bar, 'mousemove', function (e) {
-                if (!this.mousedown) {
+            var that = this;
+            EventUtil.addHandler(that.$mod, 'mousemove', function (e) {
+                if (!that.mousedown) {
                     return;
                 }
                 var eve = EventUtil.getEvent(e);
-                var target = EventUtil.getTarget(e);
-                target.style.left = (eve.clientX - this.disX + 150) + 'px';
-                target.style.top = (eve.clientY - this.disY + 50) + 'px';
+                var target = that.$bar;
+                var leftWidth = eve.clientX - that.disX + 150;
+                var topHeight = eve.clientY - that.disY + 50;
+                target.style.left = EventUtil.getBoundValue('row', leftWidth);
+                target.style.top = EventUtil.getBoundValue('col', topHeight);
             });
         },
 
         //完成拖拽
         _onDragEnd: function () {
-            EventUtil.addHandler(this.bar, 'mouseup', function (e) {
-                var target = EventUtil.getTarget(e);
-                this.mousedown = false;
-                EventUtil.removeClass(target,'start');
+            var that = this;
+            EventUtil.addHandler(that.$mod, 'mouseup', function (e) {
+                var target = that.$bar;
+                that.mousedown = false;
+                EventUtil.removeClass(target, 'start');
             });
         }
 
