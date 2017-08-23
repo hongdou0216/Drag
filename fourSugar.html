@@ -13,12 +13,12 @@
             height: 100%;
         }
 
-        #main {
+        .main {
             width: 100%;
             height: 100%;
         }
 
-        #bar {
+        .bar {
             z-index: 100;
             position: absolute;
             left: 50%;
@@ -40,12 +40,19 @@
     </style>
 </head>
 <body>
-<div id="main">
-    <div id="bar">我可以被拖动</div>
+<div class="main">
+    <div class="bar">我可以被拖动</div>
 </div>
 </body>
 <script>
+    var $mod = document.querySelector('.main');
+    var $moveBar = $mod.querySelector('.bar');
 
+    window.onload = function () {
+        new Drag($mod, $moveBar);
+    }
+
+    //工具类
     var EventUtil = {
         getEvent: function (event) {
             return event || window.event;
@@ -82,12 +89,14 @@
         },
         //边界值
         getBoundValue: function (direction, range) {
+            var cWidth = document.documentElement.clientWidth;
+            var cHeight = document.documentElement.clientHeight;
             if (direction === 'row') {
                 if (150 > range) {
                     return '150px';
                 } else {
-                    if (range > (document.documentElement.clientWidth - 150)) {
-                        return document.documentElement.clientWidth - 150 + 'px';
+                    if (range > (cWidth - 150)) {
+                        return cWidth - 150 + 'px';
                     } else {
                         return range + 'px';
                     }
@@ -96,8 +105,8 @@
                 if (50 > range) {
                     return '50px';
                 } else {
-                    if (range > (document.documentElement.clientHeight - 50)) {
-                        return document.documentElement.clientHeight - 50 + 'px';
+                    if (range > (cHeight - 50)) {
+                        return cHeight - 50 + 'px';
                     } else {
                         return range + 'px';
                     }
@@ -106,17 +115,10 @@
         }
 
     }
-    var $mod = document.getElementById('main');
-    //ie8一下不支持getElementsByClassName
-    var $moveBar = document.getElementById('bar');
-
-    window.onload = function () {
-        new Drag($mod, $moveBar);
-    }
 
     function Drag($mod, $bar) {
-        this.$bar = $bar;
-        this.$mod = $mod;
+        this.$mod = $mod; //页面
+        this.$bar = $bar; //被拖动的元素
         this.disX = 0;
         this.disY = 0;
         this.mousedown = false;//点击bar后，鼠标move才会拖拽
@@ -135,7 +137,7 @@
         _onDragStart: function () {
             var that = this;
             EventUtil.addHandler(that.$bar, 'mousedown', function (e) {
-                // console.log(that.$mod)
+                //console.log(that.$mod)
                 that.mousedown = true;
                 var eve = EventUtil.getEvent(e);
                 var target = EventUtil.getTarget(eve);
@@ -167,7 +169,7 @@
         //完成拖拽
         _onDragEnd: function () {
             var that = this;
-            EventUtil.addHandler(that.$mod, 'mouseup', function (e) {
+            EventUtil.addHandler(that.$mod, 'mouseup', function () {
                 var target = that.$bar;
                 that.mousedown = false;
                 EventUtil.removeClass(target, 'start');
